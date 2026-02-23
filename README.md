@@ -49,7 +49,7 @@ working on bringing full editing support to the portal soon.)
    dependencies:
 
    ```json
-   "@zuplo/zudoku-plugin-monetization": "0.0.12"
+   "@zuplo/zudoku-plugin-monetization": "0.0.14"
    ```
 
 3. Next, open `docs/zudoku.config.tsx` and wire up the plugin:
