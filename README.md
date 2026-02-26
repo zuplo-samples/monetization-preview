@@ -656,28 +656,6 @@ curl --request GET \
 
 ![API usage consumed](images/api_consumed.png)
 
-## View all subscriptions (Admin)
-
-As the API provider, you can view and manage all customer subscriptions from the
-admin dashboard.
-
-> **Note:** During this early preview, the admin dashboard isn't visible in the
-> portal navigation yet — you'll need to access it directly via URL. We're
-> actively working on integrating this into the main UI, so this will get much
-> easier soon!
-
-1. Navigate directly to your monetization dashboard by constructing this URL
-   with your account, project, and bucket ID:
-
-   ```
-   https://portal.zuplo.com/<account>/<project>/services/monetization/<bucket-id>
-   ```
-
-![Admin view for customers](images/admin_view_for_customers.png)
-
-2. From here, you can click on any customer to view their subscription details,
-   usage history, and more.
-
 ## Next steps
 
 Congratulations — you've set up monetization for your API! Here are some ideas
