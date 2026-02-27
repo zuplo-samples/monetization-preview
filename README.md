@@ -498,6 +498,9 @@ For more plan examples (including trial periods and multiple tiers), check out
 our
 [plan examples documentation](https://zuplo.com/docs/articles/monetization/plan-examples)
 
+Need invite-only pricing for specific users? See
+[Private Plans: Invite-Only Subscriptions](./PRIVATE_PLANS_README.md).
+
 ## Connect to Stripe
 
 For testing, we recommend using Stripe's sandbox mode so you can simulate
