@@ -228,8 +228,8 @@ DEVELOPER_RESPONSE=$(api_call POST "/v3/metering/${ZUPLO_BUCKET_ID}/plans" '{
     },
     "name": "Developer",
     "proRatingConfig": {
-        "enabled": false,
-        "mode": "prorate_prices"
+        "enabled": true,
+        "mode": "max_consumption_based"
     },
     "phases": [
         {
@@ -303,8 +303,8 @@ PRO_RESPONSE=$(api_call POST "/v3/metering/${ZUPLO_BUCKET_ID}/plans" '{
     },
     "name": "Pro",
     "proRatingConfig": {
-        "enabled": false,
-        "mode": "prorate_prices"
+        "enabled": true,
+        "mode": "max_consumption_based"
     },
     "phases": [
         {
@@ -390,8 +390,8 @@ BUSINESS_RESPONSE=$(api_call POST "/v3/metering/${ZUPLO_BUCKET_ID}/plans" '{
     },
     "name": "Business",
     "proRatingConfig": {
-        "enabled": false,
-        "mode": "prorate_prices"
+        "enabled": true,
+        "mode": "max_consumption_based"
     },
     "phases": [
         {
