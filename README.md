@@ -223,7 +223,7 @@ curl -X POST "https://dev.zuplo.com/v3/metering/${ZUPLO_BUCKET_ID}/plans" \
     "name": "Developer",
     "proRatingConfig": {
       "enabled": false,
-      "mode": "prorate_prices"
+      "mode": "max_consumption_based"
     },
     "phases": [
       {
@@ -303,7 +303,7 @@ curl -X POST "https://dev.zuplo.com/v3/metering/${ZUPLO_BUCKET_ID}/plans" \
     "name": "Pro",
     "proRatingConfig": {
       "enabled": false,
-      "mode": "prorate_prices"
+      "mode": "max_consumption_based"
     },
     "phases": [
       {
@@ -395,7 +395,7 @@ curl -X POST "https://dev.zuplo.com/v3/metering/${ZUPLO_BUCKET_ID}/plans" \
     "name": "Business",
     "proRatingConfig": {
       "enabled": false,
-      "mode": "prorate_prices"
+      "mode": "max_consumption_based"
     },
     "phases": [
       {
