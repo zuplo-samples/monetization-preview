@@ -41,7 +41,7 @@ curl -X POST "https://dev.zuplo.com/v3/metering/${ZUPLO_BUCKET_ID}/plans" \
     },
     "name": "Private Developer",
     "proRatingConfig": {
-      "enabled": false,
+      "enabled": true,
       "mode": "max_consumption_based"
     },
     "phases": [
