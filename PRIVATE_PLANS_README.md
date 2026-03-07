@@ -36,7 +36,6 @@ curl -X POST "https://dev.zuplo.com/v3/metering/${ZUPLO_BUCKET_ID}/plans" \
     "description": "1000 requests per month with overages",
     "key": "private_developer",
     "metadata": {
-      "zuplo_plan_order": "4",
       "zuplo_private_plan": "true"
     },
     "name": "Private Developer",

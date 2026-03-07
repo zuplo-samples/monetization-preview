@@ -223,9 +223,7 @@ DEVELOPER_RESPONSE=$(api_call POST "/v3/metering/${ZUPLO_BUCKET_ID}/plans" '{
     "currency": "USD",
     "description": "1000 requests per month with overages",
     "key": "developer",
-    "metadata": {
-        "zuplo_plan_order": "1"
-    },
+    "metadata": {},
     "name": "Developer",
     "proRatingConfig": {
         "enabled": true,
@@ -298,9 +296,7 @@ PRO_RESPONSE=$(api_call POST "/v3/metering/${ZUPLO_BUCKET_ID}/plans" '{
     "currency": "USD",
     "description": "5000 requests per month with overages",
     "key": "pro",
-    "metadata": {
-        "zuplo_plan_order": "2"
-    },
+    "metadata": {},
     "name": "Pro",
     "proRatingConfig": {
         "enabled": true,
@@ -385,9 +381,7 @@ BUSINESS_RESPONSE=$(api_call POST "/v3/metering/${ZUPLO_BUCKET_ID}/plans" '{
     "currency": "USD",
     "description": "10000 requests per month with overages",
     "key": "business",
-    "metadata": {
-        "zuplo_plan_order": "3"
-    },
+    "metadata": {},
     "name": "Business",
     "proRatingConfig": {
         "enabled": true,
