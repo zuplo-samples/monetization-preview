@@ -186,8 +186,10 @@ things:
    not. Use the [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
    country code (e.g., `US`, `GB`, `DE`).
 
-2. **Enable tax collection** by setting `workflow.tax.enabled` and
-   `workflow.tax.enforced` to `true`.
+2. **Enable tax collection** by setting `workflow.tax.enabled` to `true`. Set
+   `workflow.tax.enforced` based on how strictly you want to require tax
+   calculation (see [Tax settings explained](#tax-settings-explained) below).
+   The example below uses `enforced: false` for best-effort tax collection.
 
 ```bash
 curl -X PUT "https://dev.zuplo.com/v3/metering/${ZUPLO_BUCKET_ID}/billing/profiles/${BILLING_PROFILE_ID}" \
@@ -238,7 +240,7 @@ curl -X PUT "https://dev.zuplo.com/v3/metering/${ZUPLO_BUCKET_ID}/billing/profil
       },
       "tax": {
         "enabled": true,
-        "enforced": true
+        "enforced": false
       }
     }
   }'
@@ -283,6 +285,16 @@ billing profile:
 - **`stripe.code`** — The Stripe Tax code for your product category. `txcd_10000000`
   is the general "Software as a Service (SaaS) - business use" category.
 
+## Invoice with tax collection
+
+When tax collection is working correctly, your customers' invoices will include
+tax line items. Here is an example of an invoice with 20% VAT applied:
+
+![Invoice with tax collection](images/tax/tax_collection_invoice.png)
+
+In this example, the $9.99 monthly fee has 20% UK VAT ($2.00) added on top,
+bringing the total amount due to $11.99 USD.
+
 ## Enforcement and missing tax registrations
 
 When `enforced` is set to `true` and a customer tries to subscribe from a
@@ -313,16 +325,6 @@ this configuration:
   Their invoices will simply not contain any tax lines.
 - Subscription purchases, upgrades, and downgrades will work for all customers
   regardless of their location.
-
-## Invoice with tax collection
-
-When tax collection is working correctly, your customers' invoices will include
-tax line items. Here is an example of an invoice with 20% VAT applied:
-
-![Invoice with tax collection](images/tax/tax_collection_invoice.png)
-
-In this example, the $9.99 monthly fee has 20% UK VAT ($2.00) added on top,
-bringing the total amount due to $11.99 USD.
 
 ## Related guides
 
