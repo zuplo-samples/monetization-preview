@@ -49,7 +49,7 @@ working on bringing full editing support to the portal soon.)
    dependencies:
 
    ```json
-   "@zuplo/zudoku-plugin-monetization": "0.0.21"
+   "@zuplo/zudoku-plugin-monetization": "0.0"
    ```
 
 3. Next, open `docs/zudoku.config.tsx` and wire up the plugin:
@@ -72,51 +72,9 @@ working on bringing full editing support to the portal soon.)
 4. Push your changes to the main/master branch and ensure that a new environment
    is deployed.
 
-## Get your API key
+## Navigate to the Monetization Service
 
-Since this is an early preview, we'll use the
-[Zuplo Monetization API](https://zuplo.com/docs/articles/monetization#zuplo-monetization-api-preview)
-to set up meters, features, and plans. You'll need your API key for this.
 
-1. Go to **Settings > API Keys** in the [Zuplo Portal](https://portal.zuplo.com)
-   (found under your account settings).
-   ![API key location](images/api_key_for_dev_zuplo_com.png)
-
-In the examples below, we'll refer to your API key as `ZUPLO_API_KEY`.
-
-## Get your bucket ID
-
-Each project in Zuplo has three "buckets":
-
-- **Development/working-copy** — used for local development and your working
-  copy
-- **Preview** — used for non-main branches in source control
-- **Production** — used for your main/master branch
-
-A bucket isolates the configuration for each environment. Think of it as a
-namespace — the settings you configure in one bucket won't affect the others.
-
-Since we're deploying to the main/master branch, we'll use the **production**
-bucket.
-
-![Bucket ID location](images/grab_bucket_id.png)
-
-Copy the bucket ID. We'll refer to it as `ZUPLO_BUCKET_ID` in the examples
-below.
-
----
-
-**Want to skip ahead?** We've included a script that runs all the API calls for
-you. It will prompt you for the required values:
-
-```bash
-./scripts/setup-monetization.sh
-```
-
-Or continue below to run each step manually and learn how everything fits
-together.
-
----
 
 ## Create a meter
 
@@ -126,19 +84,7 @@ calls, tokens processed, or data transferred.
 
 Let's create a meter that tracks API requests:
 
-```bash
-curl -X POST "https://dev.zuplo.com/v3/metering/${ZUPLO_BUCKET_ID}/meters" \
-  -H "Authorization: Bearer ${ZUPLO_API_KEY}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "slug": "api",
-    "name": "API",
-    "description": "API Calls",
-    "eventType": "api",
-    "aggregation": "SUM",
-    "valueProperty": "$.total"
-  }'
-```
+
 
 A few things to note:
 
