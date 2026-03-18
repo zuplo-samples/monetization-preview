@@ -530,6 +530,10 @@ you're ready for production, you can update to your live key (`sk_live_...`).
 With your plans set up, you'll need to add a monetization policy to your API
 routes. This policy checks entitlements and tracks usage automatically.
 
+If you want more details and advanced configuration options (including dynamic
+meter updates at runtime), see
+[`MONETIZATION_POLICY_README.md`](./MONETIZATION_POLICY_README.md).
+
 ### Step 1: Define the monetization policy
 
 Open `config/policies.json` and add the monetization policy:
