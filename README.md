@@ -33,32 +33,28 @@ breaking changes.
 1. Select new **API Management (+ MCP Server)** project.
 1. Select **Starter Project (Recommended)**— it comes with some endpoints ready
    to monetize, which makes following along much easier.
-   ![Creating a new project](images/create_new_project.png)
+   ![Creating a new project](images/create-project.png)
 1. Connect your project to source control by following our
    [GitHub setup guide](https://zuplo.com/docs/articles/source-control-setup-github).
 
-## Clone the project and work on it locally
+## Enable the monetization plugin
 
-For now, you'll need to make a few edits locally to enable monetization in your
-developer portal. Don't worry — it's just a couple of quick changes! (We're
-working on bringing full editing support to the portal soon.)
+You'll need to make a quick edit in the portal to enable monetization in your
+developer portal.
 
-1. Clone your project's repository to your local machine.
+1. In your project, navigate to the **Code** tab.
 
-2. Open `docs/package.json` and add the monetization plugin to your
-   dependencies:
+2. In the file tree on the left, find and open `docs/zudoku.config.tsx`.
 
-   ```json
-   "@zuplo/zudoku-plugin-monetization": "0.0.21"
-   ```
-
-3. Next, open `docs/zudoku.config.tsx` and wire up the plugin:
+3. Add the monetization plugin import at the top of the file:
 
    ```tsx
-   // Add this import at the top of the file
    import { zuploMonetizationPlugin } from "@zuplo/zudoku-plugin-monetization";
+   ```
 
-   // Then add the plugin to your plugins array
+4. Then add the plugin to your `plugins` array in the config:
+
+   ```tsx
    const config: ZudokuConfig = {
      // ... your existing config
      plugins: [
@@ -69,54 +65,17 @@ working on bringing full editing support to the portal soon.)
    };
    ```
 
-4. Push your changes to the main/master branch and ensure that a new environment
-   is deployed.
+   ![Zudoku config with monetization plugin](images/code-zudoku-config.png)
 
-## Get your API key
+5. Save the file and ensure that a new environment is deployed.
 
-Since this is an early preview, we'll use the
-[Zuplo Monetization API](https://zuplo.com/docs/articles/monetization#zuplo-monetization-api-preview)
-to set up meters, features, and plans. You'll need your API key for this.
+## Configuring the Monetization Service
 
-1. Go to **Settings > API Keys** in the [Zuplo Portal](https://portal.zuplo.com)
-   (found under your account settings).
-   ![API key location](images/api_key_for_dev_zuplo_com.png)
+1. Navigate to the **Services** tab in your project.
+2. Select the environment you want to configure (e.g., **Working Copy**).
+3. Click **Configure** on the **Monetization Service** card.
 
-In the examples below, we'll refer to your API key as `ZUPLO_API_KEY`.
-
-## Get your bucket ID
-
-Each project in Zuplo has three "buckets":
-
-- **Development/working-copy** — used for local development and your working
-  copy
-- **Preview** — used for non-main branches in source control
-- **Production** — used for your main/master branch
-
-A bucket isolates the configuration for each environment. Think of it as a
-namespace — the settings you configure in one bucket won't affect the others.
-
-Since we're deploying to the main/master branch, we'll use the **production**
-bucket.
-
-![Bucket ID location](images/grab_bucket_id.png)
-
-Copy the bucket ID. We'll refer to it as `ZUPLO_BUCKET_ID` in the examples
-below.
-
----
-
-**Want to skip ahead?** We've included a script that runs all the API calls for
-you. It will prompt you for the required values:
-
-```bash
-./scripts/setup-monetization.sh
-```
-
-Or continue below to run each step manually and learn how everything fits
-together.
-
----
+![Configuring the Monetization Service](images/configure-service.png)
 
 ## Create a meter
 
@@ -126,26 +85,27 @@ calls, tokens processed, or data transferred.
 
 Let's create a meter that tracks API requests:
 
-```bash
-curl -X POST "https://dev.zuplo.com/v3/metering/${ZUPLO_BUCKET_ID}/meters" \
-  -H "Authorization: Bearer ${ZUPLO_API_KEY}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "slug": "api",
-    "name": "API",
-    "description": "API Calls",
-    "eventType": "api",
-    "aggregation": "SUM",
-    "valueProperty": "$.total"
-  }'
-```
+1. In the Monetization Service, click the **Meters** tab.
+2. Click **Add Meter** and select **Blank Meter**.
+
+   ![Create a meter](images/create-meter.png)
+
+3. Fill in the meter details:
+   - **Name**: `API`
+   - **Event**: `api`
+   - **Description**: `API Calls`
+   - **Aggregation**: `SUM`
+   - **Value Property**: `$.total`
+
+4. Click **Add Meter** to save.
+
+   ![Create meter form](images/create-meter-form.png)
 
 A few things to note:
 
-- **slug**: A unique identifier for this meter (you'll reference this later)
-- **eventType**: The type of event to listen for
-- **aggregation**: How to combine values (SUM, COUNT, MAX, etc.)
-- **valueProperty**: A JSONPath expression to extract the value from events
+- **Event**: The type of event to listen for
+- **Aggregation**: How to combine values (SUM, COUNT, MAX, etc.)
+- **Value Property**: A JSONPath expression to extract the value from events
 
 ## Create features
 
@@ -153,44 +113,32 @@ Features define what your customers get access to. They can be tied to meters
 (for usage-based features) or standalone (for boolean features like "Metadata
 Support").
 
-We'll create three features for our plans:
+We'll create three features for our plans. In the Monetization Service, click
+the **Features** tab, then click **Add Feature** for each one:
 
 **1. API Feature** (linked to our meter):
 
-```bash
-curl -X POST "https://dev.zuplo.com/v3/metering/${ZUPLO_BUCKET_ID}/features" \
-  -H "Authorization: Bearer ${ZUPLO_API_KEY}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "key": "api",
-    "name": "API",
-    "meterSlug": "api"
-  }'
-```
+- **Name**: `api`
+- **Key**: `api`
+- **Linked Meter**: `API`
+
+![Add feature](images/add-feature.png)
 
 **2. Monthly Fee Feature** (for flat-rate billing):
 
-```bash
-curl -X POST "https://dev.zuplo.com/v3/metering/${ZUPLO_BUCKET_ID}/features" \
-  -H "Authorization: Bearer ${ZUPLO_API_KEY}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "key": "monthly_fee",
-    "name": "Monthly Fee"
-  }'
-```
+- **Name**: `Monthly Fee`
+- **Key**: `monthly_fee`
+- **Linked Meter**: leave empty
 
 **3. Metadata Support Feature** (a boolean feature):
 
-```bash
-curl -X POST "https://dev.zuplo.com/v3/metering/${ZUPLO_BUCKET_ID}/features" \
-  -H "Authorization: Bearer ${ZUPLO_API_KEY}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "key": "metadata_support",
-    "name": "Metadata Support"
-  }'
-```
+- **Name**: `Metadata Support`
+- **Key**: `metadata_support`
+- **Linked Meter**: leave empty
+
+Once all three features are created, your Features tab should look like this:
+
+![Features result](images/adding-feature-result.png)
 
 ## Create plans
 
@@ -206,287 +154,139 @@ your customers options:
 
 ### Developer Plan
 
-The entry-level plan for developers getting started:
+The entry-level plan for developers getting started — includes 1,000 API
+requests per month at $9.99, with overage charged at $0.10 per request.
 
-```bash
-curl -X POST "https://dev.zuplo.com/v3/metering/${ZUPLO_BUCKET_ID}/plans" \
-  -H "Authorization: Bearer ${ZUPLO_API_KEY}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "billingCadence": "P1M",
-    "currency": "USD",
-    "description": "1000 requests per month with overages",
-    "key": "developer",
-    "metadata": {},
-    "name": "Developer",
-    "proRatingConfig": {
-      "enabled": true,
-      "mode": "max_consumption_based"
-    },
-    "phases": [
-      {
-        "duration": null,
-        "key": "default",
-        "name": "Default",
-        "rateCards": [
-          {
-            "billingCadence": "P1M",
-            "featureKey": "monthly_fee",
-            "key": "monthly_fee",
-            "name": "Monthly Fee",
-            "price": {
-              "amount": "9.99",
-              "paymentTerm": "in_advance",
-              "type": "flat"
-            },
-            "type": "flat_fee"
-          },
-          {
-            "billingCadence": "P1M",
-            "entitlementTemplate": {
-              "isSoftLimit": true,
-              "issueAfterReset": 1000,
-              "preserveOverageAtReset": false,
-              "type": "metered",
-              "usagePeriod": "P1M"
-            },
-            "featureKey": "api",
-            "key": "api",
-            "name": "api",
-            "price": {
-              "mode": "graduated",
-              "tiers": [
-                {
-                  "flatPrice": {
-                    "amount": "0",
-                    "type": "flat"
-                  },
-                  "unitPrice": null,
-                  "upToAmount": "1000"
-                },
-                {
-                  "flatPrice": null,
-                  "unitPrice": {
-                    "amount": "0.10",
-                    "type": "unit"
-                  }
-                }
-              ],
-              "type": "tiered"
-            },
-            "type": "usage_based"
-          }
-        ]
-      }
-    ]
-  }'
-```
+1. In the **Plans** tab, click **Create Plan**.
+2. Fill in the plan details:
+   - **Plan Name**: `Developer`
+   - **Key**: `developer`
+3. Click **Create Draft**.
+
+   ![Create Developer plan draft](images/plan-developer-draft.png)
+
+4. Configure the rate cards for the plan:
+
+   **Monthly Fee** rate card:
+   - **Pricing Model**: Flat fee
+   - **Billing Cadence**: Monthly
+   - **Payment Term**: In advance
+   - **Price**: $9.99
+   - **Entitlement**: No entitlement
+
+   **api** rate card:
+   - **Pricing Model**: Tiered
+   - **Billing Cadence**: Monthly
+   - **Price Mode**: Graduated
+   - **Tier 1**: First Unit `0`, Last Unit `1000`, Unit Price $0, Flat Price $0
+   - **Tier 2**: First Unit `1001`, to infinity, Unit Price $0.10, Flat Price $0
+   - **Entitlement**: Metered (track usage)
+   - **Usage Limit**: `1000`
+   - **Soft limit**: enabled
+
+5. Click **Save**.
+
+   ![Developer plan full configuration](images/plan-developer-full.png)
 
 ### Pro Plan
 
-For growing teams that need more capacity and the Metadata Support feature:
+For growing teams that need more capacity — includes 5,000 API requests per
+month at $19.99, with overage charged at $0.05 per request, plus Metadata
+Support.
 
-```bash
-curl -X POST "https://dev.zuplo.com/v3/metering/${ZUPLO_BUCKET_ID}/plans" \
-  -H "Authorization: Bearer ${ZUPLO_API_KEY}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "billingCadence": "P1M",
-    "currency": "USD",
-    "description": "5000 requests per month with overages",
-    "key": "pro",
-    "metadata": {},
-    "name": "Pro",
-    "proRatingConfig": {
-      "enabled": true,
-      "mode": "max_consumption_based"
-    },
-    "phases": [
-      {
-        "duration": null,
-        "key": "default",
-        "name": "Default",
-        "rateCards": [
-          {
-            "billingCadence": "P1M",
-            "featureKey": "monthly_fee",
-            "key": "monthly_fee",
-            "name": "Monthly Fee",
-            "price": {
-              "amount": "19.99",
-              "paymentTerm": "in_advance",
-              "type": "flat"
-            },
-            "type": "flat_fee"
-          },
-          {
-            "billingCadence": "P1M",
-            "entitlementTemplate": {
-              "isSoftLimit": true,
-              "issueAfterReset": 5000,
-              "preserveOverageAtReset": false,
-              "type": "metered",
-              "usagePeriod": "P1M"
-            },
-            "featureKey": "api",
-            "key": "api",
-            "name": "api",
-            "price": {
-              "mode": "graduated",
-              "tiers": [
-                {
-                  "flatPrice": {
-                    "amount": "0",
-                    "type": "flat"
-                  },
-                  "unitPrice": null,
-                  "upToAmount": "5000"
-                },
-                {
-                  "flatPrice": null,
-                  "unitPrice": {
-                    "amount": "0.05",
-                    "type": "unit"
-                  }
-                }
-              ],
-              "type": "tiered"
-            },
-            "type": "usage_based"
-          },
-          {
-            "type": "flat_fee",
-            "key": "metadata_support",
-            "name": "Metadata Support",
-            "featureKey": "metadata_support",
-            "billingCadence": null,
-            "price": null,
-            "entitlementTemplate": {
-              "type": "boolean",
-              "config": true
-            }
-          }
-        ]
-      }
-    ]
-  }'
-```
+1. In the **Plans** tab, click **Create Plan**.
+2. Fill in the plan details:
+   - **Plan Name**: `Pro`
+   - **Key**: `pro`
+3. Click **Create Draft**.
+
+4. Configure the rate cards for the plan:
+
+   **Monthly Fee** rate card:
+   - **Pricing Model**: Flat fee
+   - **Billing Cadence**: Monthly
+   - **Payment Term**: In advance
+   - **Price**: $19.99
+   - **Entitlement**: No entitlement
+
+   **api** rate card:
+   - **Pricing Model**: Tiered
+   - **Billing Cadence**: Monthly
+   - **Price Mode**: Graduated
+   - **Tier 1**: First Unit `0`, Last Unit `5000`, Unit Price $0, Flat Price $0
+   - **Tier 2**: First Unit `5001`, to infinity, Unit Price $0.05, Flat Price $0
+   - **Entitlement**: Metered (track usage)
+   - **Usage Limit**: `5000`
+   - **Soft limit**: enabled
+
+   **Metadata Support** rate card:
+   - **Entitlement**: Boolean
+   - **Enabled**: true
+
+5. Click **Save**.
+
+   ![Pro plan full configuration](images/plan-pro-full.png)
 
 ### Business Plan
 
-For high-volume users who want the best overage rates:
+For high-volume users who want the best overage rates — includes 10,000 API
+requests per month at $29.99, with overage charged at $0.01 per request, plus
+Metadata Support.
 
-```bash
-curl -X POST "https://dev.zuplo.com/v3/metering/${ZUPLO_BUCKET_ID}/plans" \
-  -H "Authorization: Bearer ${ZUPLO_API_KEY}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "billingCadence": "P1M",
-    "currency": "USD",
-    "description": "10000 requests per month with overages",
-    "key": "business",
-    "metadata": {},
-    "name": "Business",
-    "proRatingConfig": {
-      "enabled": true,
-      "mode": "max_consumption_based"
-    },
-    "phases": [
-      {
-        "duration": null,
-        "key": "default",
-        "name": "Default",
-        "rateCards": [
-          {
-            "billingCadence": "P1M",
-            "featureKey": "monthly_fee",
-            "key": "monthly_fee",
-            "name": "Monthly Fee",
-            "price": {
-              "amount": "29.99",
-              "paymentTerm": "in_advance",
-              "type": "flat"
-            },
-            "type": "flat_fee"
-          },
-          {
-            "billingCadence": "P1M",
-            "entitlementTemplate": {
-              "isSoftLimit": true,
-              "issueAfterReset": 10000,
-              "preserveOverageAtReset": false,
-              "type": "metered",
-              "usagePeriod": "P1M"
-            },
-            "featureKey": "api",
-            "key": "api",
-            "name": "api",
-            "price": {
-              "mode": "graduated",
-              "tiers": [
-                {
-                  "flatPrice": {
-                    "amount": "0",
-                    "type": "flat"
-                  },
-                  "unitPrice": null,
-                  "upToAmount": "10000"
-                },
-                {
-                  "flatPrice": null,
-                  "unitPrice": {
-                    "amount": "0.01",
-                    "type": "unit"
-                  }
-                }
-              ],
-              "type": "tiered"
-            },
-            "type": "usage_based"
-          },
-          {
-            "type": "flat_fee",
-            "key": "metadata_support",
-            "name": "Metadata Support",
-            "featureKey": "metadata_support",
-            "billingCadence": null,
-            "price": null,
-            "entitlementTemplate": {
-              "type": "boolean",
-              "config": true
-            }
-          }
-        ]
-      }
-    ]
-  }'
-```
+1. In the **Plans** tab, click **Create Plan**.
+2. Fill in the plan details:
+   - **Plan Name**: `Business`
+   - **Key**: `business`
+3. Click **Create Draft**.
+
+4. Configure the rate cards for the plan:
+
+   **Monthly Fee** rate card:
+   - **Pricing Model**: Flat fee
+   - **Billing Cadence**: Monthly
+   - **Payment Term**: In advance
+   - **Price**: $29.99
+   - **Entitlement**: No entitlement
+
+   **api** rate card:
+   - **Pricing Model**: Tiered
+   - **Billing Cadence**: Monthly
+   - **Price Mode**: Graduated
+   - **Tier 1**: First Unit `0`, Last Unit `10000`, Unit Price $0, Flat Price $0
+   - **Tier 2**: First Unit `10001`, to infinity, Unit Price $0.01, Flat Price $0
+   - **Entitlement**: Metered (track usage)
+   - **Usage Limit**: `10000`
+   - **Soft limit**: enabled
+
+   **Metadata Support** rate card:
+   - **Pricing Model**: Free
+   - **Entitlement**: Boolean (on/off)
+
+5. Click **Save**.
+
+   ![Business plan full configuration](images/plan-business-full.png)
+
+### Reorder your plans
+
+The order of plans on the Plans tab determines how they appear on your pricing
+page. By default, newly created plans are added to the end. Drag and drop the
+plans using the handle on the top-left corner of each card to reorder them as
+**Developer**, **Pro**, **Business**.
+
+![Plans before reordering](images/reorder-plan-0.png)
+
+![Plans after reordering](images/reorder-plan-1.png)
 
 ### Publish your plans
 
 Each plan starts as a draft. You'll need to publish each one before customers
-can subscribe. Take note of the `id` returned when you create each plan, then
-publish them:
+can subscribe.
 
-```bash
-# Publish the Developer plan
-curl -X POST "https://dev.zuplo.com/v3/metering/${ZUPLO_BUCKET_ID}/plans/${DEVELOPER_PLAN_ID}/publish" \
-  -H "Authorization: Bearer ${ZUPLO_API_KEY}" \
-  -H "Content-Type: application/json" \
-  -d '{}'
+1. On each plan card, click the **...** context menu.
+2. Select **Publish Plan**.
+3. Repeat for all three plans (Developer, Pro, Business).
 
-# Publish the Pro plan
-curl -X POST "https://dev.zuplo.com/v3/metering/${ZUPLO_BUCKET_ID}/plans/${PRO_PLAN_ID}/publish" \
-  -H "Authorization: Bearer ${ZUPLO_API_KEY}" \
-  -H "Content-Type: application/json" \
-  -d '{}'
-
-# Publish the Business plan
-curl -X POST "https://dev.zuplo.com/v3/metering/${ZUPLO_BUCKET_ID}/plans/${BUSINESS_PLAN_ID}/publish" \
-  -H "Authorization: Bearer ${ZUPLO_API_KEY}" \
-  -H "Content-Type: application/json" \
-  -d '{}'
-```
+![Publishing a plan](images/publish-plans.png)
 
 For more plan examples (including trial periods and multiple tiers), check out
 our
@@ -508,17 +308,14 @@ payments without real charges. Here's how to set it up:
 
 ![alt text](images/stripe_secret_key.png)
 
-3. Connect Stripe to your Zuplo bucket:
+3. In the Monetization Service, click **Payment Provider** in the left sidebar.
+4. Click **Configure** on the Stripe card.
 
-```bash
-curl -X POST "https://dev.zuplo.com/v3/metering/${ZUPLO_BUCKET_ID}/setup/stripe" \
-  -H "Authorization: Bearer ${ZUPLO_API_KEY}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "apiKey": "${STRIPE_KEY}",
-    "name": "Monetization Getting Started"
-  }'
-```
+   ![Payment Provider](images/connect-stripe-1.png)
+
+5. Enter a **Name** and paste your **Stripe API Key**, then click **Save**.
+
+   ![Setup Stripe](images/connect-stripe-2.png)
 
 **Important:** Always use your Stripe **test** key (`sk_test_...`) while
 following this guide. This creates a sandbox environment where you can safely
